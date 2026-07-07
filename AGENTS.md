@@ -172,6 +172,7 @@ Installed from: D:\Users\vie\Desktop\shop-knowledge
 - `node scripts/agent-mode.mjs check <file>` — check file allowed
 - `node scripts/agent-mode.mjs clear` — reset to coordinator
 - `node scripts/precheck.mjs <file> "<code>"` — pre-write check
-- `node "D:\Users\vie\Desktop\shop-knowledge\scripts\ensure-git.mjs" "."` — ensure Git initialized
+- `node scripts/ensure-git.mjs "."` — ensure Git initialized (local)
+- `node "D:\Users\vie\Desktop\shop-knowledge\scripts\ensure-git.mjs" "."` — ensure Git initialized (shop-knowledge)
 - `npm run security-audit` — post-write vulnerability scan
 <!-- END:shop-knowledge -->
