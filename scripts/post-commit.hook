@@ -1,0 +1,5 @@
+@echo off
+echo.
+echo === 🔒 Security Audit ===
+node "%~dp0..\scripts\security-audit.mjs"
+echo.

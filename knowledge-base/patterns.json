@@ -1,0 +1,67 @@
+[
+  {
+    "id": "PATTERN-001",
+    "name": "تسريب error.message في API Response",
+    "type": "dangerous-code",
+    "severity": "high",
+    "regex": "\\.message",
+    "context_pattern": "NextResponse\\.json\\(\\{[^}]*error[^}]*\\.message",
+    "file_filter": "app/api/**/route.{ts,js}",
+    "mistake_id": "ERR-001",
+    "action": "BLOCK",
+    "message_ar": "⚠️ تحذير: لا تمرر `.message` من الخطأ في Response. استخدم رسالة خطأ عامة بدلاً من ذلك. راجع ERR-001.",
+    "message_en": "⚠️ Warning: Do not expose `error.message` in API response. Use a generic error message instead. See ERR-001."
+  },
+  {
+    "id": "PATTERN-002",
+    "name": "createAdminClient في API عام",
+    "type": "dangerous-code",
+    "severity": "critical",
+    "regex": "createAdminClient\\(",
+    "context_pattern": "createAdminClient",
+    "file_filter": "app/api/**/route.{ts,js}",
+    "mistake_id": "ERR-004",
+    "action": "BLOCK",
+    "message_ar": "⛔ توقف: `createAdminClient()` يستخدم service_role key ويتجاوز RLS. استخدم `createClient()`除非. راجع ERR-004.",
+    "message_en": "⛔ STOP: `createAdminClient()` uses service_role key and bypasses RLS. Use `createClient()` unless absolutely necessary. See ERR-004."
+  },
+  {
+    "id": "PATTERN-003",
+    "name": "API عام بدون Zod Validation",
+    "type": "missing-pattern",
+    "severity": "medium",
+    "regex": "await request\\.json\\(\\)",
+    "context_pattern": "await request\\.json\\(\\)(?!\\s*\\/\\/.*zod|\\s*;\\s*\\/\\/.*schema|\\s*;\\s*const\\s+parsed)",
+    "file_filter": "app/api/**/route.{ts,js}",
+    "mistake_id": "ERR-005",
+    "action": "WARN",
+    "message_ar": "⚠️ تنبيه: `await request.json()` بدون Zod validation. أضف `.safeParse()` للتحقق من صحة البيانات. راجع ERR-005.",
+    "message_en": "⚠️ Note: `await request.json()` without Zod validation. Add `.safeParse()` to validate input. See ERR-005."
+  },
+  {
+    "id": "PATTERN-004",
+    "name": "Admin API بدون Role Check",
+    "type": "missing-pattern",
+    "severity": "critical",
+    "regex": "export\\s+(async\\s+)?function\\s+(POST|PUT|PATCH|DELETE)",
+    "context_pattern": "export\\s+(async\\s+)?function\\s+(POST|PUT|PATCH|DELETE)(?![\\s\\S]*role)",
+    "file_filter": "app/api/admin/**/route.{ts,js}",
+    "mistake_id": "ERR-002",
+    "action": "BLOCK",
+    "message_ar": "⛔ توقف: هذذذا Admin API mutation route يحتاج فحص صلاحية (role check). استخدم pattern التحقق من `role !== 'admin'` قبل معالجة الطلب. راجع ERR-002.",
+    "message_en": "⛔ STOP: This admin API route needs role verification after authentication. See ERR-002."
+  },
+  {
+    "id": "PATTERN-005",
+    "name": "مقارنة ألوان بدون COLOR_HEX_MAP",
+    "type": "missing-pattern",
+    "severity": "low",
+    "regex": "\\.color\\b",
+    "context_pattern": "\\.color\\b(?!.*COLOR_HEX_MAP)",
+    "file_filter": "components/shop/**/*.tsx",
+    "mistake_id": null,
+    "action": "INFO",
+    "message_ar": "💡 نصيحة: إذا كنت تعرض لوناً في واجهة المتجر، تأكد من استخدام `COLOR_HEX_MAP` لتحويل اسم اللون إلى Hex. راجع ProductDetailClient.tsx.",
+    "message_en": "💡 Tip: If displaying colors in the shop UI, use `COLOR_HEX_MAP` to convert color names to hex values. See ProductDetailClient.tsx."
+  }
+]

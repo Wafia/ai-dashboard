@@ -1,0 +1,167 @@
+[
+  {
+    "id": "ERR-001",
+    "title": "تسريب أخطاء قاعدة البيانات للمستخدم",
+    "category": "security",
+    "severity": "medium",
+    "project": "my-project",
+    "pattern": {
+      "description": "إرجاع `error.message` مباشرة في response API ليعرض تفاصيل قاعدة البيانات",
+      "code_pattern": "error.message",
+      "file_pattern": "app/api/*/route.ts"
+    },
+    "symptom": "المستخدم/الهاكر يشاهد أسماء الجداول، العلاقات (Foreign Keys)، قيود قاعدة البيانات",
+    "root_cause": "كتابة `return NextResponse.json({ error: err.message })` وليس رسالة عامة",
+    "solution": "استخدم رسالة خطأ عامة: `{ error: 'حدث خطأ أثناء المعالجة' }` وسجّل التفاصيل في server log",
+    "example_fix": "// خطأ:\nreturn NextResponse.json({ error: error.message }, { status: 500 })\n\n// صحيح:\nconsole.error('DB Error:', error.message);\nreturn NextResponse.json({ error: 'حدث خطأ أثناء المعالجة' }, { status: 500 })",
+    "files_affected": [
+      "app/api/admin/*/route.ts (62 files)",
+      "app/api/orders/create/route.ts",
+      "app/api/orders/bulk-delete/route.ts",
+      "app/api/employees/*/route.ts",
+      "app/api/shipping/*/route.ts",
+      "app/api/sync/*/route.ts",
+      "app/api/tracking/*/route.ts",
+      "app/api/webhooks/*/route.ts"
+    ],
+    "date_discovered": "2026-07-04",
+    "date_fixed": null,
+    "occurrences": 62,
+    "tags": ["api", "error-handling", "security", "information-disclosure"],
+    "related_ids": []
+  },
+  {
+    "id": "ERR-002",
+    "title": "API Admin بدون فحص صلاحية (Role Check)",
+    "category": "security",
+    "severity": "high",
+    "project": "my-project",
+    "pattern": {
+      "description": "API routes تحت /admin/ تتحقق من session (مصادقة) ولكن لا تتحقق من role (صلاحية)",
+      "code_pattern": "!role || (role !== 'admin' && role !== 'employee')",
+      "file_pattern": "app/api/admin/*/route.ts"
+    },
+    "symptom": "أي موظف عادي يقدر يعدل المنتجات، الطلبات، إعدادات المتجر، pixels",
+    "root_cause": "المشروع يتحقق من وجود session فقط، ولا يتحقق من أن المستخدم عنده صلاحية admin",
+    "solution": "أضف فحص role بعد الحصول على session: إذا role !== 'admin' ← 403 Forbidden",
+    "example_fix": "const { data: { user } } = await supabase.auth.getUser();\nif (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });\n// فحص الصلاحية:\nconst { data: employee } = await supabase.from('employees').select('role').eq('id', user.id).single();\nif (!employee || employee.role !== 'admin') return NextResponse.json({ error: 'Forbidden' }, { status: 403 });",
+    "files_affected": [
+      "app/api/admin/*/route.ts (23 files)"
+    ],
+    "date_discovered": "2026-07-04",
+    "date_fixed": null,
+    "occurrences": 23,
+    "tags": ["api", "authorization", "security", "privilege-escalation"],
+    "related_ids": []
+  },
+  {
+    "id": "ERR-003",
+    "title": "حماية CSRF غير موجودة",
+    "category": "security",
+    "severity": "low",
+    "project": "my-project",
+    "pattern": {
+      "description": "لا توجد CSRF tokens في أي POST/PUT/DELETE request",
+      "code_pattern": "csrf",
+      "file_pattern": "**/*.ts"
+    },
+    "symptom": "نظرياً أي موقع خارجي يقدر يرسل طلبات للـ API (لكن SameSite=Lax يمنع هذا عملياً)",
+    "root_cause": "لم يتم تطبيق CSRF protection مطلقاً",
+    "solution": "أضف CSRF token عبر middleware أو مكتبة",
+    "example_fix": "// middleware.ts:\nimport { csrf } from 'next-csrf';\n// أو استخدم SameSite policy الحالية - كافية للمشروع",
+    "files_affected": ["جميع API routes"],
+    "date_discovered": "2026-07-04",
+    "date_fixed": null,
+    "occurrences": 1,
+    "tags": ["api", "csrf", "security"],
+    "related_ids": []
+  },
+  {
+    "id": "ERR-004",
+    "title": "Service Role Key مستخدمة في API عامة",
+    "category": "security",
+    "severity": "high",
+    "project": "my-project",
+    "pattern": {
+      "description": "استخدام `createAdminClient()` (service_role key) في API routes يمكن الوصول إليها من المتصفح",
+      "code_pattern": "createAdminClient",
+      "file_pattern": "app/api/*/route.ts"
+    },
+    "symptom": "الـ service_role key تتجاوز RLS policies — إذا تسربت، يقدر الهاكر يعدل أي شيء في قاعدة البيانات",
+    "root_cause": "استخدام admin client (service_role) في API للعامة أو حتى للداخلين",
+    "solution": "استخدم `createClient()` (anon key) للقراءة من API العامة، واحتفظ بـ admin client فقط للـ server-side calls الآمنة",
+    "example_fix": "// خطأ في API عام:\nconst db = createAdminClient(); // service_role!\n\n// صحيح:\nconst db = createClient(); // anon key مع RLS",
+    "files_affected": [
+      "app/api/admin/mapping-sync/route.ts",
+      "app/api/orders/bulk-delete/route.ts",
+      "app/api/shipping/estimate/route.ts",
+      "app/api/shipping/rates/route.ts"
+    ],
+    "date_discovered": "2026-07-04",
+    "date_fixed": null,
+    "occurrences": 4,
+    "tags": ["api", "security", "supabase", "service-role"],
+    "related_ids": []
+  },
+  {
+    "id": "ERR-005",
+    "title": "API عامة بدون Zod Validation",
+    "category": "quality",
+    "severity": "medium",
+    "project": "my-project",
+    "pattern": {
+      "description": "API routes عامة تستخدم `req.json()` مباشرة بدون Zod schema validation",
+      "code_pattern": "await request.json()",
+      "file_pattern": "app/api/**/route.ts"
+    },
+    "symptom": "إمكانية إدخال بيانات خاطئة أو malformed JSON بدون تحقق",
+    "root_cause": "عدم استخدام Zod schemas للتحقق من صحة البيانات المدخلة",
+    "solution": "أضف Zod schema لجميع API routes التي تستقبل POST/PUT/PATCH",
+    "example_fix": "import { z } from 'zod';\nconst OrderSchema = z.object({ customer_name: z.string().min(1), phone: z.string().min(8) });\nconst parsed = OrderSchema.safeParse(body);\nif (!parsed.success) return NextResponse.json({ error: 'بيانات غير صحيحة' }, { status: 400 });",
+    "files_affected": [
+      "app/api/auth/send-otp/route.ts",
+      "app/api/auth/verify-otp/route.ts",
+      "app/api/orders/create/route.ts",
+      "app/api/orders/bulk-delete/route.ts",
+      "app/api/orders/track-action/route.ts",
+      "app/api/products/route.ts",
+      "app/api/tracking/event/route.ts",
+      "app/api/tracking/order-status/route.ts",
+      "app/api/tracking/test-connection/route.ts",
+      "app/api/webhooks/yalidine/route.ts",
+      "app/api/employees/*/route.ts",
+      "app/api/salary/*/route.ts"
+    ],
+    "date_discovered": "2026-07-04",
+    "date_fixed": null,
+    "occurrences": 14,
+    "tags": ["api", "validation", "quality"],
+    "related_ids": []
+  },
+  {
+    "id": "ERR-006",
+    "title": "Rate Limiting غير مفعل على API العامة",
+    "category": "security",
+    "severity": "medium",
+    "project": "my-project",
+    "pattern": {
+      "description": "نظام الحماية (Protection system) موجود كـ UI فقط ولا يطبق أي rate limiting على API",
+      "code_pattern": "protection_config",
+      "file_pattern": "app/api/orders/create/route.ts"
+    },
+    "symptom": "أي شخص يقدر يرسل آلاف الطلبات لـ /api/orders/create بدون تحديد",
+    "root_cause": "الـ protection system له واجهة وإعدادات لكن لم يربط مع API بعد",
+    "solution": "فعل الـ protection checks في middleware.ts أو في كل API route",
+    "example_fix": "// middleware.ts:\nconst config = await getProtectionConfig();\nif (config?.ip_limit?.enabled) { /* apply rate limit */ }",
+    "files_affected": [
+      "app/api/orders/create/route.ts",
+      "app/api/auth/send-otp/route.ts",
+      "app/api/auth/verify-otp/route.ts"
+    ],
+    "date_discovered": "2026-07-04",
+    "date_fixed": null,
+    "occurrences": 1,
+    "tags": ["api", "rate-limiting", "security", "protection"],
+    "related_ids": []
+  }
+]
