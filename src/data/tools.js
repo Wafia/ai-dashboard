@@ -146,7 +146,8 @@ export const tools = [
     gradient: 'from-amber-500 to-orange-600',
     component: 'ImageGenerator',
     apiKeyLabel: 'مفتاح Image API',
-    apiKeyPlaceholder: 'أدخل مفتاح API...'
+    apiKeyPlaceholder: 'أدخل مفتاح API...',
+    noKeyRequired: true
   },
   {
     id: 'code-helper',

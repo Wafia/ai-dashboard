@@ -184,7 +184,7 @@ export default function ToolLayout({
 
       {/* Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6">
-        {apiKey ? (
+        {apiKey || tool?.noKeyRequired ? (
           children
         ) : (
           <div className="flex flex-col items-center justify-center py-20 text-center">

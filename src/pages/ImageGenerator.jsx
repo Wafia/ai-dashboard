@@ -1,5 +1,4 @@
 import { useState, useEffect, useRef } from 'react';
-import { AI_PROVIDERS } from '../data/providers';
 import { 
   Sparkles, Image as ImageIcon, Sliders, Settings, Folder, BookOpen, 
   Download, Copy, Trash2, Heart, RotateCcw, Maximize2, Layers, 
@@ -9,14 +8,36 @@ import {
 } from 'lucide-react';
 
 const STYLE_PRESETS = [
-  { id: 'photorealistic', name: 'Photorealistic', desc: 'Ultra-realistic details & cinematic lens', icon: '📷', positive: 'hyperrealistic, highly detailed, professional cinematography, 8k resolution, dramatic lighting' },
-  { id: 'product', name: 'Product Photography', desc: 'Clean, studio lighting, professional backdrop', icon: '📦', positive: 'high-end product photography, commercial advertising, sharp focus, soft shadows, studio lighting, clean background' },
-  { id: 'luxury', name: 'Luxury Aesthetic', desc: 'Premium materials, elegant lighting, gold accents', icon: '✨', positive: 'luxury brand editorial, opulent, gold accent, elegant composition, high fashion, sophisticated mood' },
-  { id: 'minimal', name: 'Minimalist Studio', desc: 'Clean lines, neutral palette, soft diffusion', icon: '⬜', positive: 'minimalist design, sleek, neutral colors, architectural digest style, clean composition, soft diffusion' },
-  { id: 'fashion', name: 'Fashion Editorial', desc: 'High-contrast, high-fashion styling', icon: '👗', positive: 'high fashion editorial, vogue style, avant-garde makeup, artistic lighting, dynamic pose, sharp focus' },
-  { id: 'cinematic', name: 'Cinematic Mood', desc: 'Anamorphic, mood lighting, movie style', icon: '🎬', positive: 'cinematic still, anamorphic lens, blade runner aesthetic, moody atmosphere, volumetric haze, epic composition' },
-  { id: 'ecommerce', name: 'E-commerce Listing', desc: 'Crisp white BG, high fidelity', icon: '🛒', positive: 'e-commerce product catalog shot, isolated white background, perfect exposure, ultra-sharp details' },
-  { id: 'no-bg', name: 'No Background', desc: 'Transparent backdrop setup', icon: '✂️', positive: 'studio portrait, isolated on solid white, vector cutout style, easy background removal, high contrast' },
+  // ── Product Photography ──
+  { id: 'luxury-perfume', name: 'عطر فاخر', desc: 'تصوير منتجات فاخر', icon: '📦', positive: 'Professional commercial product photography of a luxury perfume bottle on a matte stone pedestal, soft diffused studio lighting, elegant shadow, premium minimalist background, sharp focus, realistic glass reflections, high detail, advertising quality' },
+  { id: 'wireless-earbuds', name: 'سماعات لاسلكية', desc: 'منتج إلكتروني احترافي', icon: '🎧', positive: 'Premium product shot of wireless earbuds in an open charging case, clean white studio background, softbox lighting, crisp reflections, ultra detailed, modern commercial advertising style, realistic materials' },
+  { id: 'smartwatch', name: 'ساعة ذكية', desc: 'إلكترونيات فاخرة', icon: '⌚', positive: 'High-end commercial photography of a black smartwatch floating above a dark reflective surface, cinematic rim lighting, clean premium background, realistic metal and glass textures, sharp focus, luxury tech advertisement' },
+  { id: 'sports-shoes', name: 'حذاء رياضي', desc: 'إعلان رياضي احترافي', icon: '👟', positive: 'Professional sports shoe advertising image, dynamic angle, dramatic studio lighting, soft shadow on textured floor, realistic fabric and rubber details, modern brand campaign look, ultra sharp' },
+  { id: 'luxury-handbag', name: 'حقيبة نسائية', desc: 'أزياء فاخرة', icon: '👜', positive: 'Luxury handbag product photography on a beige elegant backdrop, soft natural light from the side, refined editorial composition, realistic leather texture, premium fashion campaign aesthetic' },
+  // ── Food & Drink ──
+  { id: 'gourmet-burger', name: 'برجر شهي', desc: 'تصوير طعام احترافي', icon: '🍔', positive: 'Gourmet burger food photography, fresh ingredients, warm restaurant lighting, shallow depth of field, realistic textures, steam rising, dark moody background, high-end menu advertising style' },
+  { id: 'artisan-coffee', name: 'قهوة مختصة', desc: 'مشروبات دافئة', icon: '☕', positive: 'Artisan coffee cup on a wooden table near a window, cinematic morning light, cozy café atmosphere, realistic steam, rich brown tones, editorial lifestyle photography, highly detailed' },
+  // ── Portraits ──
+  { id: 'pro-portrait', name: 'بورتريه احترافي', desc: 'صورة شخصية احترافية', icon: '👔', positive: 'Ultra realistic professional portrait of a confident young entrepreneur, clean studio background, soft key light, subtle rim light, sharp eyes, natural skin texture, premium editorial photography' },
+  { id: 'linkedin-headshot', name: 'LinkedIn', desc: 'بورتريه أعمال رسمي', icon: '💼', positive: 'Professional business headshot on neutral background, soft flattering studio lighting, confident expression, realistic skin detail, polished corporate portrait, premium quality' },
+  { id: 'fashion-editorial', name: 'فاشن إديتوريال', desc: 'أزياء عصرية', icon: '👗', positive: 'Editorial fashion portrait of a woman in a modern black outfit, dramatic side lighting, minimalist background, magazine cover composition, sharp focus, premium luxury aesthetic' },
+  // ── Content & Social ──
+  { id: 'youtube-thumbnail', name: 'ثامبنيل يوتيوب', desc: 'صورة مصغرة احترافية', icon: '▶️', positive: 'Cinematic YouTube thumbnail style portrait of a surprised man pointing at a glowing futuristic screen, high contrast lighting, vibrant but clean background, dramatic composition, ultra detailed, attention-grabbing' },
+  // ── Automotive ──
+  { id: 'luxury-car', name: 'سيارة فاخرة', desc: 'تصوير سيارات ليلي', icon: '🚗', positive: 'Luxury sports car parked on a wet city street at night, cinematic neon reflections, realistic metallic paint, dramatic atmosphere, sharp focus, high-end automotive photography' },
+  // ── Travel ──
+  { id: 'travel-scene', name: 'سفر ومناظر', desc: 'تصوير سياحي', icon: '🌅', positive: 'Breathtaking travel photography of a coastal town at sunset, golden light, realistic water reflections, layered composition, detailed buildings, high-end tourism advertisement' },
+  // ── Beauty ──
+  { id: 'skincare', name: 'عناية بالبشرة', desc: 'منتجات تجميل', icon: '🧴', positive: 'Premium skincare product display with water droplets, clean spa-inspired background, soft white lighting, realistic glass and liquid textures, elegant beauty brand advertisement' },
+  // ── Jewelry ──
+  { id: 'diamond-ring', name: 'خاتم ألماس', desc: 'تصوير مجوهرات', icon: '💍', positive: 'Luxury diamond ring macro photography, black velvet background, dramatic spotlight, crisp reflections, ultra detailed gemstone sparkle, premium jewelry campaign style' },
+  // ── Real Estate ──
+  { id: 'luxury-interior', name: 'ديكور داخلي', desc: 'تصوير عقارات', icon: '🏠', positive: 'Luxury modern living room interior design, wide-angle shot, soft daylight entering through large windows, elegant neutral palette, realistic furniture textures, architectural magazine quality' },
+  { id: 'storefront', name: 'واجهة متجر', desc: 'تصوير تجاري واجهات', icon: '🏪', positive: 'Stylish storefront exterior of a premium fashion boutique, golden hour lighting, clean urban street, realistic glass reflections, elegant branding space, commercial architectural photography' },
+  // ── Mockups & Creative ──
+  { id: 'book-mockup', name: 'موكاب كتاب', desc: 'عرض منتج رقمي', icon: '📖', positive: 'Professional mockup of a premium book standing upright on a clean minimal desk, soft natural lighting, elegant shadows, realistic paper texture, commercial branding presentation' },
+  { id: 'anime-portrait', name: 'أنمي فاخر', desc: 'رسم أنمي احترافي', icon: '🎨', positive: 'High quality anime-style portrait of a futuristic female character, cinematic lighting, clean composition, detailed hair strands, expressive eyes, polished professional illustration quality' },
+  { id: 'cinematic-scene', name: 'مشهد سينمائي', desc: 'تصوير قصصي', icon: '🎬', positive: 'Cinematic scene of a lone traveler walking through a vast desert at sunset, dramatic sky, long shadows, film-like composition, realistic atmosphere, epic visual storytelling' },
 ];
 
 const PROMPT_TEMPLATES = [
@@ -57,7 +78,7 @@ const INITIAL_PROJECTS = [
       promptStrength: 75,
       imageStrength: 50,
       seed: '458192039',
-      stylePreset: 'product',
+      stylePreset: 'luxury-perfume',
       provider: 'gemini'
     },
     references: [],
@@ -94,7 +115,7 @@ const INITIAL_PROJECTS = [
       promptStrength: 85,
       imageStrength: 30,
       seed: '77210928',
-      stylePreset: 'cinematic',
+      stylePreset: 'cinematic-scene',
       provider: 'replicate'
     },
     references: [],
@@ -150,6 +171,7 @@ export default function ImageGenerator({ apiKey: providedApiKey = '', model: sel
   const [isUploadingRef, setIsUploadingRef] = useState(false);
   const fileInputRef = useRef(null);
 
+  const [pollinationsKey, setPollinationsKey] = useState('');
   const [apiErrorDetails, setApiErrorDetails] = useState(null);
 
   const [isGenerating, setIsGenerating] = useState(false);
@@ -296,232 +318,127 @@ export default function ImageGenerator({ apiKey: providedApiKey = '', model: sel
     showToast("Reference image removed.");
   };
 
-  const processImageUrl = async (url) => {
-    if (url.startsWith('http') && !url.startsWith('http://localhost') && !url.startsWith('data:')) {
-      const imgRes = await fetch(url);
-      const blob = await imgRes.blob();
-      return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = () => resolve(reader.result);
-        reader.onerror = reject;
-        reader.readAsDataURL(blob);
-      });
-    }
-    return url;
-  };
-
   const triggerGeneration = async () => {
     if (!prompt.trim()) {
-      showToast("يرجى إدخال النص الوصفي أولاً لبدء المعالجة.", "error");
+      showToast("يرجى إدخال النص الوصفي أولاً.", "error");
       return;
     }
 
     setIsGenerating(true);
-    setGenerationProgress(5);
-    setEstimatedTime(10);
+    setGenerationProgress(10);
     setApiErrorDetails(null);
-
-    const progressInterval = setInterval(() => {
-      setGenerationProgress(prev => {
-        if (prev >= 90) return 90;
-        return prev + Math.floor(Math.random() * 8) + 2;
-      });
-      setEstimatedTime(prevEst => Math.max(1, prevEst - 1));
-    }, 900);
 
     try {
       const presetData = STYLE_PRESETS.find(s => s.id === stylePreset);
-      const enhancedPrompt = presetData 
-        ? `${prompt}, ${presetData.positive}` 
-        : prompt;
 
-      const provider = AI_PROVIDERS[layoutProvider];
-      if (!provider) throw new Error(`المزوّد "${layoutProvider}" غير معروف.`);
-      if (!providedApiKey) throw new Error(`مفتاح API غير موجود. اختر مزوّداً وأدخل مفتاحك في شريط الأدوات العلوي.`);
-
-      const effectiveModel = selectedModel || provider.defaultModel;
-      let generatedUrls = [];
-
-      if (layoutProvider === 'gemini') {
+      let enhancedPrompt;
+      if (referenceImages.length > 0 && pollinationsKey) {
+        setGenerationProgress(20);
         try {
-          // محاولة: نقطة النهاية الجديدة /v1beta/interactions (موديلات Nano Banana)
-          const payload = {
-            model: effectiveModel,
-            input: enhancedPrompt,
-            response_format: { type: "image", mime_type: "image/png", aspect_ratio: "1:1", image_size: "1K" }
-          };
+          const firstRef = referenceImages[0];
+          const parts = firstRef.url.split(',');
+          const base64Data = parts[1] || '';
+          const mimeMatch = parts[0]?.match(/data:(.*?);/);
+          const mimeType = mimeMatch ? mimeMatch[1] : 'image/jpeg';
 
-          if (referenceImages.length > 0) {
-            const base64Clean = referenceImages[0].url.split(',')[1];
-            const mimeType = referenceImages[0].url.split(';')[0].split(':')[1] || "image/png";
-            payload.input = [
-              { type: "text", text: `Create a modified high-quality version preserving the reference image. ${enhancedPrompt}` },
-              { type: "image", image: { data: base64Clean, mime_type: mimeType } }
-            ];
-          }
-
-          const res = await fetchWithRetry(
-            `https://generativelanguage.googleapis.com/v1beta/interactions?key=${providedApiKey}`,
-            { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) }
-          );
-
-          if (res.ok) {
-            const result = await res.json();
-            const imageData = result?.interaction?.response_image?.data;
-            if (imageData) {
-              generatedUrls.push(`data:image/png;base64,${imageData}`);
-            } else {
-              throw new Error("لم يتم العثور على بيانات الصورة في استجابة Gemini.");
-            }
-          } else {
-            const errBody = await res.json().catch(() => ({}));
-            throw new Error(`خطأ Gemini (${res.status}): ${errBody?.error?.message || res.statusText}`);
-          }
-        } catch (geminiErr) {
-          // إذا فشلت الطريقة الجديدة، نجرب الطريقة القديمة
-          const payload = {
-            contents: [{ role: "user", parts: [{ text: enhancedPrompt }] }],
-            generationConfig: { responseModalities: ["TEXT", "IMAGE"] }
-          };
-
-          if (referenceImages.length > 0) {
-            const base64Clean = referenceImages[0].url.split(',')[1];
-            const mimeType = referenceImages[0].url.split(';')[0].split(':')[1] || "image/png";
-            payload.contents[0].parts = [
-              { text: `Create a modified high-quality version preserving the reference image. ${enhancedPrompt}` },
-              { inlineData: { mimeType, data: base64Clean } }
-            ];
-          }
-
-          const targetUrl = provider.endpoint(providedApiKey, effectiveModel);
-          const res = await fetchWithRetry(targetUrl, {
+          setGenerationProgress(35);
+          const visionRes = await fetch('https://gen.pollinations.ai/v1/chat/completions', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
-          });
-
-          if (!res.ok) {
-            const msg = (await res.json().catch(() => ({})))?.error?.message || res.statusText;
-            throw new Error(`خطأ Gemini (${res.status}): ${msg}`);
-          }
-
-          const result = await res.json();
-          const part = result?.candidates?.[0]?.content?.parts?.find(p => p.inlineData);
-          if (!part || !part.inlineData?.data) {
-            throw new Error(`الموديل "${effectiveModel}" لم يُرجع صورة عبر Gemini. استخدم OpenRouter مع Nano Banana أو GPT-5 Image.`);
-          }
-          generatedUrls.push(`data:${part.inlineData.mimeType};base64,${part.inlineData.data}`);
-        }
-
-      } else if (layoutProvider === 'openrouter') {
-        const isImageModel = effectiveModel.includes('-image') || effectiveModel.includes('gemini-3') || effectiveModel.includes('gpt-5');
-
-        if (isImageModel) {
-          // نقطة النهاية المخصصة لتوليد الصور
-          const res = await fetchWithRetry("https://openrouter.ai/api/v1/images/generations", {
-            method: "POST",
-            headers: provider.headers(providedApiKey),
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${pollinationsKey}`
+            },
             body: JSON.stringify({
-              model: effectiveModel,
-              prompt: enhancedPrompt,
-              n: 1
+              model: 'qwen-vision',
+              messages: [
+                {
+                  role: 'system',
+                  content: 'You are an expert image analyst. Describe the image style concisely for recreating it in AI image generation.'
+                },
+                {
+                  role: 'user',
+                  content: [
+                    { type: 'text', text: 'Analyze the visual style of this reference image. Describe ONLY: colors, lighting, composition, mood, texture, camera angle. Return a short comma-separated description under 50 words.' },
+                    { type: 'image_url', image_url: { url: `data:${mimeType};base64,${base64Data}` } }
+                  ]
+                }
+              ],
+              max_tokens: 200
             })
           });
 
-          if (!res.ok) {
-            const errBody = await res.json().catch(() => ({}));
-            throw new Error(`خطأ OpenRouter (${res.status}): ${errBody?.error?.message || res.statusText}`);
-          }
+          if (!visionRes.ok) throw new Error(`Pollinations API error: ${visionRes.status}`);
 
-          const result = await res.json();
-          const imageUrl = result?.data?.[0]?.url;
-          if (imageUrl) {
-            generatedUrls.push(await processImageUrl(imageUrl));
+          const visionData = await visionRes.json();
+          const analysis = visionData.choices?.[0]?.message?.content || '';
+
+          const cleanAnalysis = analysis.trim().replace(/^["']+|["']+$/g, '');
+          enhancedPrompt = cleanAnalysis
+            ? `${prompt}, ${presetData?.positive || ''}. Style reference: ${cleanAnalysis}`
+            : (presetData ? `${prompt}, ${presetData.positive}` : prompt);
+        } catch (e) {
+          console.warn('Vision analysis via Pollinations skipped:', e.message);
+          if (e.message?.includes('402')) {
+            showToast('تحليل الصور يحتاج رصيد Pollen — أضف رصيد من enter.pollinations.ai أو أنجز المهام للحصول على رصيد مجاني', 'error');
           } else {
-            throw new Error(`الموديل "${effectiveModel}" لم يُرجع صورة.`);
+            showToast('تعذر تحليل الصورة المرجعية — تم التوليد باستخدام النص الوصفي فقط', 'error');
           }
+          enhancedPrompt = presetData ? `${prompt}, ${presetData.positive}` : prompt;
+        }
+      } else {
+        setGenerationProgress(25);
+        try {
+          const enhancePrompt = presetData
+            ? `Enhance this AI image generation prompt by blending the user's idea with the style preset. Return ONLY the enhanced prompt, no explanation.\n\nUser prompt: ${prompt}\nStyle preset: ${presetData.positive}`
+            : `Enhance this AI image generation prompt with more detail and quality keywords. Return ONLY the enhanced prompt, no explanation.\n\nUser prompt: ${prompt}`;
+          const enhanceRes = await fetch(`https://text.pollinations.ai/${encodeURIComponent(enhancePrompt)}?model=openai`);
+          if (enhanceRes.ok) {
+            const enhancedText = await enhanceRes.text();
+            enhancedPrompt = enhancedText.trim() || `${prompt}, ${presetData?.positive || ''}`;
+          } else {
+            enhancedPrompt = presetData ? `${prompt}, ${presetData.positive}` : prompt;
+          }
+        } catch (e) {
+          enhancedPrompt = presetData ? `${prompt}, ${presetData.positive}` : prompt;
+        }
+      }
+
+      // Step 2: Generate multiple images based on outputs count
+      const [w, h] = (aspectRatio === '1:1' ? [1024, 1024]
+        : aspectRatio === '4:5' ? [832, 1088]
+        : aspectRatio === '16:9' ? [1216, 832]
+        : aspectRatio === '9:16' ? [832, 1216]
+        : aspectRatio === '3:2' ? [1216, 832]
+        : [1024, 1024]);
+
+      const numOutputs = Math.max(1, Math.min(4, parseInt(outputs) || 1));
+      const newGenerations = [];
+
+      for (let i = 0; i < numOutputs; i++) {
+        setGenerationProgress(40 + Math.round((i / numOutputs) * 45));
+
+        const imgSeed = Math.floor(Math.random() * 1000000);
+        const safePrompt = encodeURIComponent(enhancedPrompt).slice(0, 1800);
+        const safeNegative = negativePrompt ? `&negative=${encodeURIComponent(negativePrompt).slice(0, 400)}` : '';
+
+        let imgUrl;
+        if (pollinationsKey) {
+          imgUrl = `https://gen.pollinations.ai/image/${safePrompt}?model=flux&key=${pollinationsKey}&width=${w}&height=${h}&seed=${imgSeed}&nologo=true${safeNegative}`;
         } else {
-          // chat completions للموديلات النصية العادية
-          let baseUrl = provider.endpoint;
-          if (!baseUrl.endsWith('/chat/completions')) {
-            baseUrl = baseUrl.replace(/\/+$/, '') + '/chat/completions';
-          }
-
-          const res = await fetchWithRetry(baseUrl, {
-            method: "POST",
-            headers: provider.headers(providedApiKey),
-            body: JSON.stringify({
-              model: effectiveModel,
-              messages: [{ role: "user", content: enhancedPrompt }],
-              max_tokens: 1024
-            })
-          });
-
-          if (!res.ok) {
-            const errBody = await res.json().catch(() => ({}));
-            throw new Error(`خطأ OpenRouter (${res.status}): ${errBody?.error?.message || res.statusText}`);
-          }
-
-          const result = await res.json();
-          const text = result.choices?.[0]?.message?.content || '';
-          const urlMatch = text.match(/https?:\/\/[^\s"]+\.(png|jpg|jpeg|webp|gif)/i);
-          if (urlMatch) {
-            generatedUrls.push(await processImageUrl(urlMatch[0]));
-          } else {
-            throw new Error(`الموديل "${effectiveModel}" ليس موديل توليد صور. اختر Nano Banana أو GPT-5 Image من قائمة الموديلات.`);
-          }
+          imgUrl = `https://image.pollinations.ai/prompt/${safePrompt}?width=${w}&height=${h}&seed=${imgSeed}&nologo=true&enhance=true${safeNegative}`;
         }
 
-      } else if (layoutProvider === 'nvidia') {
-        let baseUrl = provider.endpoint;
-        if (!baseUrl.endsWith('/chat/completions')) {
-          baseUrl = baseUrl.replace(/\/+$/, '') + '/chat/completions';
-        }
-
-        const fetchUrl = provider.supportsBrowserCors === false
-          ? '/api/cors-proxy'
-          : baseUrl;
-
-        const res = await fetchWithRetry(fetchUrl, {
-          method: "POST",
-          headers: provider.headers(providedApiKey),
-          body: JSON.stringify({
-            model: effectiveModel,
-            messages: [{ role: "user", content: enhancedPrompt }],
-            max_tokens: 1024
-          })
+        newGenerations.push({
+          id: 'gen-' + Date.now() + '-' + i,
+          url: imgUrl,
+          prompt: prompt,
+          timestamp: new Date().toISOString().replace('T', ' ').substring(0, 16),
+          settings: { aspectRatio, stylePreset, quality, creativity },
+          favorite: false
         });
-
-        if (!res.ok) {
-          const errBody = await res.json().catch(() => ({}));
-          throw new Error(`خطأ NVIDIA (${res.status}): ${errBody?.error?.message || res.statusText}`);
-        }
-
-        const result = await res.json();
-        const text = result.choices?.[0]?.message?.content || '';
-        const urlMatch = text.match(/https?:\/\/[^\s"]+\.(png|jpg|jpeg|webp|gif)/i);
-        if (urlMatch) {
-          generatedUrls.push(await processImageUrl(urlMatch[0]));
-        } else {
-          throw new Error(`الموديل "${effectiveModel}" لم يُرجع صورة عبر NVIDIA.`);
-        }
       }
 
-      clearInterval(progressInterval);
-      setGenerationProgress(100);
-
-      if (generatedUrls.length === 0) {
-        throw new Error("لم يتم توليد أي صور. تحقق من إعدادات المزود والموديل.");
-      }
-
-      const newGenerations = generatedUrls.map((url, idx) => ({
-        id: 'gen-' + Date.now() + '-' + idx,
-        url: url,
-        prompt: prompt,
-        timestamp: new Date().toISOString().replace('T', ' ').substring(0, 16),
-        settings: { aspectRatio, stylePreset, quality, creativity },
-        favorite: false
-      }));
+      setGenerationProgress(90);
 
       setProjects(prev => prev.map(proj => {
         if (proj.id === currentProjectId) {
@@ -530,13 +447,13 @@ export default function ImageGenerator({ apiKey: providedApiKey = '', model: sel
         return proj;
       }));
 
-      showToast("تم توليد الصورة بنجاح!");
+      setGenerationProgress(100);
+      showToast(`تم توليد ${numOutputs} صورة بنجاح!`);
 
     } catch (err) {
-      clearInterval(progressInterval);
       setApiErrorDetails({
-        provider: layoutProvider,
-        message: err.message || "حدث خطأ غير معروف أثناء التوليد.",
+        provider: 'pollinations',
+        message: err.message || "حدث خطأ أثناء التوليد.",
         timestamp: new Date().toLocaleTimeString()
       });
       showToast("فشلت عملية التوليد.", "error");
@@ -937,16 +854,38 @@ export default function ImageGenerator({ apiKey: providedApiKey = '', model: sel
                   )}
                 </div>
 
-                <div className="pt-2 border-t border-gray-800/40">
-                  <label className="text-[10px] font-bold text-gray-500 tracking-wider block mb-2 uppercase">المزوّد النشط (من شريط الأدوات)</label>
-                  <div className={`p-3 rounded-xl border ${layoutProvider === 'gemini' ? 'border-indigo-500 bg-indigo-500/10' : layoutProvider === 'openrouter' ? 'border-emerald-500 bg-emerald-500/10' : 'border-purple-500 bg-purple-500/10'} flex items-center justify-between`}>
-                    <div className="flex items-center gap-2">
-                      <div className={`w-2 h-2 rounded-full ${layoutProvider === 'gemini' ? 'bg-indigo-400' : layoutProvider === 'openrouter' ? 'bg-emerald-400' : 'bg-purple-400'}`}></div>
-                      <span className="text-sm font-semibold text-white capitalize">{layoutProvider}</span>
+                <div className="pt-2 border-t border-gray-800/40 space-y-3">
+                  <div>
+                    <label className="text-[10px] font-bold text-gray-500 tracking-wider block mb-2 uppercase">المزوّد النشط (من شريط الأدوات)</label>
+                    <div className={`p-3 rounded-xl border ${layoutProvider === 'gemini' ? 'border-indigo-500 bg-indigo-500/10' : layoutProvider === 'openrouter' ? 'border-emerald-500 bg-emerald-500/10' : 'border-purple-500 bg-purple-500/10'} flex items-center justify-between`}>
+                      <div className="flex items-center gap-2">
+                        <div className={`w-2 h-2 rounded-full ${layoutProvider === 'gemini' ? 'bg-indigo-400' : layoutProvider === 'openrouter' ? 'bg-emerald-400' : 'bg-purple-400'}`}></div>
+                        <span className="text-sm font-semibold text-white capitalize">{layoutProvider}</span>
+                      </div>
+                      <span className="text-[10px] text-gray-400">{selectedModel}</span>
                     </div>
-                    <span className="text-[10px] text-gray-400">{selectedModel || provider?.defaultModel || ''}</span>
+                    <p className="text-[10px] text-gray-500 mt-1.5">غيّر المزوّد والموديل من شريط الأدوات العلوي</p>
                   </div>
-                  <p className="text-[10px] text-gray-500 mt-1.5">غيّر المزوّد والموديل من شريط الأدوات العلوي</p>
+                  <div>
+                    <label className="text-[10px] font-bold text-gray-400 block mb-1">POLLINATIONS API KEY (للتحليل البصري)</label>
+                    <div className="flex gap-2">
+                      <input
+                        type="password"
+                        value={pollinationsKey}
+                        onChange={(e) => setPollinationsKey(e.target.value)}
+                        placeholder="sk_..."
+                        className="bg-gray-950 border border-gray-800 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-emerald-500 flex-grow font-mono"
+                      />
+                      <button
+                        onClick={() => setPollinationsKey('sk_7aJWTZGZ19kX4b8WHNaMCcLGBVnsjtMr')}
+                        className="px-3 py-1.5 bg-emerald-600/30 border border-emerald-500/30 hover:bg-emerald-600 text-emerald-200 rounded-lg text-[10px] font-semibold transition-all whitespace-nowrap"
+                        title="Use saved key"
+                      >
+                        <Key className="w-3 h-3 inline mr-1" />Auto-fill
+                      </button>
+                    </div>
+                    <p className="text-[10px] text-gray-500 mt-1">مطلوب لتحليل الصور المرجعية. احصل عليه من enter.pollinations.ai</p>
+                  </div>
                 </div>
 
                 <div className="pt-2 border-t border-gray-800/40 space-y-3">
@@ -1037,7 +976,7 @@ export default function ImageGenerator({ apiKey: providedApiKey = '', model: sel
                       <h3 className="text-lg font-semibold text-gray-200">Your Creative Canvas is Blank</h3>
                       <p className="text-sm text-gray-400 max-w-sm mx-auto">Input your description parameters, adjust style parameters on the left, and let the AI compile custom design pieces for you.</p>
                       <div className="pt-2">
-                        <button onClick={() => { setPrompt("Raw realistic professional commercial shot of futuristic watch lying inside illuminated blue pool of crystal water, hyperdetailed, 8k resolution"); setStylePreset("luxury"); showToast("Applied quick starter prompt!"); }} className="text-xs text-indigo-400 hover:text-indigo-300 font-medium underline">
+                        <button onClick={() => { setPrompt("Raw realistic professional commercial shot of futuristic watch lying inside illuminated blue pool of crystal water, hyperdetailed, 8k resolution"); setStylePreset("luxury-perfume"); showToast("Applied quick starter prompt!"); }} className="text-xs text-indigo-400 hover:text-indigo-300 font-medium underline">
                           ✨ Load a high-converting sample prompt
                         </button>
                       </div>
