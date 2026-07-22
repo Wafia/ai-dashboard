@@ -28,6 +28,8 @@ function AdminRouter() {
   );
 }
 
+const ADMIN_EMAILS = ['whadj53@gmail.com'];
+
 function RequireAuth({ children, adminOnly = false }) {
   const { user, role, loading } = useAuth();
   const location = useLocation();
@@ -44,7 +46,10 @@ function RequireAuth({ children, adminOnly = false }) {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
-  if (adminOnly && role !== 'admin') {
+  const userEmail = user?.email || '';
+  const isAdminEmail = ADMIN_EMAILS.includes(userEmail);
+
+  if (adminOnly && role !== 'admin' && !isAdminEmail) {
     return <Navigate to="/" replace />;
   }
 

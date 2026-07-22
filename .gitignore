@@ -28,3 +28,6 @@ dist-ssr
 temp_prompt.txt
 test_ds*.json
 supabase/.temp/
+
+.vercel
+.env*

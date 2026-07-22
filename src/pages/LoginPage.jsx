@@ -20,7 +20,8 @@ export default function LoginPage() {
       if (signInError) throw signInError;
 
       const role = data.user?.user_metadata?.role || data.user?.app_metadata?.role;
-      const isAdmin = role === 'admin' || email === 'whadj53@gmail.com';
+      const adminEmails = ['whadj53@gmail.com'];
+      const isAdmin = role === 'admin' || adminEmails.includes(email);
 
       navigate(isAdmin ? '/admin/dashboard' : '/');
     } catch (err) {
