@@ -20,10 +20,8 @@ export default function LoginPage() {
       if (signInError) throw signInError;
 
       const role = data.user?.user_metadata?.role || data.user?.app_metadata?.role;
-      const adminEmails = ['whadj53@gmail.com'];
-      const isAdmin = role === 'admin' || adminEmails.includes(email);
 
-      navigate(isAdmin ? '/admin/dashboard' : '/');
+      navigate('/');
     } catch (err) {
       setError(err.message === 'Invalid login credentials' ? 'الإيميل أو كلمة المرور غير صحيحة' : 'حدث خطأ في تسجيل الدخول');
     } finally {

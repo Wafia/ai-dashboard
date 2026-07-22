@@ -6,12 +6,16 @@ import { useAuth } from '../hooks/useAuth';
 
 export default function Dashboard() {
   const navigate = useNavigate();
-  const { role } = useAuth();
+  const { user, role } = useAuth();
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
     navigate('/login');
   };
+
+  const adminEmails = ['whadj53@gmail.com'];
+  const userEmail = user?.email || '';
+  const isAdmin = role === 'admin' || adminEmails.includes(userEmail);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-slate-800 to-indigo-950" dir="rtl">
@@ -23,7 +27,7 @@ export default function Dashboard() {
             <span className="text-white font-bold text-lg">AI Tools Hub</span>
           </div>
           <div className="flex items-center gap-3">
-            {role === 'admin' && (
+            {isAdmin && (
               <button
                 onClick={() => navigate('/admin/dashboard')}
                 className="flex items-center gap-2 px-4 py-2 bg-white/10 text-white rounded-xl hover:bg-white/20 transition-all text-sm"
