@@ -194,7 +194,7 @@ Execute the 5-stage analysis pipeline. Generate grip instructions and two orient
       if (!parsed.verticalPrompt) throw new Error('Response missing verticalPrompt');
       setResult(parsed);
     } catch (err) {
-      setError(err.message || 'Analysis failed');
+      setError('حدث خطأ أثناء التحليل');
     } finally {
       setLoading(false);
     }

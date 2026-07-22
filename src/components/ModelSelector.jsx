@@ -105,7 +105,7 @@ export default function ModelSelector({ providerId, apiKey, value, onChange, pro
       const data = await res.json();
       setApiModels(data?.data || []);
     } catch (e) {
-      setError(e.message);
+      setError('حدث خطأ في تحميل الموديلات');
       setApiModels([]);
     } finally {
       setLoading(false);

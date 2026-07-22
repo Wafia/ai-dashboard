@@ -1,10 +1,12 @@
 import { useState, useEffect, useRef } from 'react';
-import { 
-  Sparkles, Image as ImageIcon, Sliders, Settings, Folder, BookOpen, 
-  Download, Copy, Trash2, Heart, RotateCcw, Maximize2, Layers, 
-  Check, ArrowRight, HelpCircle, Code, Plus, ChevronRight, X, 
-  Upload, Shuffle, ZoomIn, Info, Eye, RefreshCw, Key,
-  Moon, Sun, Database, FileText, Columns, AlertTriangle
+import { useNavigate } from 'react-router-dom';
+import {
+  Sparkles, Image as ImageIcon, Sliders, Settings, Folder, BookOpen,
+  Download, Copy, Trash2, Heart, RotateCcw, Maximize2,
+  Check, ArrowRight, HelpCircle, Code, Plus, ChevronRight, X,
+  Upload, Shuffle, Info, Eye, RefreshCw, Key,
+  Moon, Sun, Database, FileText, Columns, AlertTriangle,
+  ArrowLeft
 } from 'lucide-react';
 
 const STYLE_PRESETS = [
@@ -55,6 +57,34 @@ const PROMPT_TEMPLATES = [
       { name: "Gourmet Food Close-up", template: "Delectable close-up shot of {{product}}, gourmet presentation, luxury {{style}} style, set against a cozy {{background}} scene, {{lighting}} natural light, shallow depth of field." }
     ]
   }
+];
+
+const OPENROUTER_MODELS = [
+  // Per-Image Pricing
+  { id: 'black-forest-labs/flux-2-klein-4b', name: 'FLUX.2 Klein 4B', provider: 'Black Forest Labs', price: 0.014, unit: '/megapixel', tier: 'Budget', badge: 'bg-green-500/20 text-green-400' },
+  { id: 'sourceful/riverflow-v2.5-fast', name: 'Riverflow V2.5 Fast', provider: 'Sourceful', price: 0.019, unit: '/image', tier: 'Budget', badge: 'bg-green-500/20 text-green-400' },
+  { id: 'sourceful/riverflow-v2-fast', name: 'Riverflow V2 Fast', provider: 'Sourceful', price: 0.02, unit: '/image', tier: 'Budget', badge: 'bg-green-500/20 text-green-400' },
+  { id: 'recraft-ai/recraft-v4-1-utility', name: 'Recraft V4.1 Utility', provider: 'Recraft', price: 0.035, unit: '/image', tier: 'Standard', badge: 'bg-blue-500/20 text-blue-400' },
+  { id: 'recraft-ai/recraft-v4-1', name: 'Recraft V4.1', provider: 'Recraft', price: 0.035, unit: '/image', tier: 'Standard', badge: 'bg-blue-500/20 text-blue-400' },
+  { id: 'recraft-ai/recraft-v4', name: 'Recraft V4', provider: 'Recraft', price: 0.04, unit: '/image', tier: 'Standard', badge: 'bg-blue-500/20 text-blue-400' },
+  { id: 'recraft-ai/recraft-v3', name: 'Recraft V3', provider: 'Recraft', price: 0.04, unit: '/image', tier: 'Standard', badge: 'bg-blue-500/20 text-blue-400' },
+  { id: 'x-ai/grok-imagine', name: 'Grok Imagine', provider: 'xAI', price: 0.05, unit: '/image', tier: 'Standard', badge: 'bg-blue-500/20 text-blue-400' },
+  { id: 'recraft-ai/recraft-v4-1-vector', name: 'Recraft V4.1 Vector', provider: 'Recraft', price: 0.08, unit: '/image', tier: 'Pro', badge: 'bg-purple-500/20 text-purple-400' },
+  { id: 'recraft-ai/recraft-v4-vector', name: 'Recraft V4 Vector', provider: 'Recraft', price: 0.08, unit: '/image', tier: 'Pro', badge: 'bg-purple-500/20 text-purple-400' },
+  { id: 'sourceful/riverflow-v2.5-pro', name: 'Riverflow V2.5 Pro', provider: 'Sourceful', price: 0.13, unit: '/image', tier: 'Pro', badge: 'bg-purple-500/20 text-purple-400' },
+  { id: 'sourceful/riverflow-v2-pro', name: 'Riverflow V2 Pro', provider: 'Sourceful', price: 0.15, unit: '/image', tier: 'Pro', badge: 'bg-purple-500/20 text-purple-400' },
+  { id: 'recraft-ai/recraft-v4-1-pro', name: 'Recraft V4.1 Pro', provider: 'Recraft', price: 0.21, unit: '/image', tier: 'Premium', badge: 'bg-amber-500/20 text-amber-400' },
+  { id: 'recraft-ai/recraft-v4-1-utility-pro', name: 'Recraft V4.1 Utility Pro', provider: 'Recraft', price: 0.21, unit: '/image', tier: 'Premium', badge: 'bg-amber-500/20 text-amber-400' },
+  { id: 'recraft-ai/recraft-v4-pro', name: 'Recraft V4 Pro', provider: 'Recraft', price: 0.25, unit: '/image', tier: 'Premium', badge: 'bg-amber-500/20 text-amber-400' },
+  { id: 'recraft-ai/recraft-v4-1-pro-vector', name: 'Recraft V4.1 Pro Vector', provider: 'Recraft', price: 0.30, unit: '/image', tier: 'Premium', badge: 'bg-amber-500/20 text-amber-400' },
+  { id: 'recraft-ai/recraft-v4-pro-vector', name: 'Recraft V4 Pro Vector', provider: 'Recraft', price: 0.30, unit: '/image', tier: 'Premium', badge: 'bg-amber-500/20 text-amber-400' },
+  // Per-Token Pricing
+  { id: 'google/gemini-3.1-flash-image', name: 'Gemini 3.1 Flash Image', provider: 'Google', price: 0.50, unit: '/M input', tier: 'Standard', badge: 'bg-blue-500/20 text-blue-400', tokenBased: true },
+  { id: 'microsoft/mai-image-2.5', name: 'MAI-Image-2.5', provider: 'Microsoft', price: 5, unit: '/M tokens', tier: 'Pro', badge: 'bg-purple-500/20 text-purple-400', tokenBased: true },
+  { id: 'google/gemini-3-pro-image', name: 'Gemini 3 Pro Image', provider: 'Google', price: 2, unit: '/M input', tier: 'Premium', badge: 'bg-amber-500/20 text-amber-400', tokenBased: true },
+  { id: 'openai/gpt-image-1-mini', name: 'GPT Image 1 Mini', provider: 'OpenAI', price: 2.50, unit: '/M input', tier: 'Pro', badge: 'bg-purple-500/20 text-purple-400', tokenBased: true },
+  { id: 'openai/gpt-image-2', name: 'GPT Image 2', provider: 'OpenAI', price: 8, unit: '/M input', tier: 'Premium', badge: 'bg-amber-500/20 text-amber-400', tokenBased: true },
+  { id: 'openai/gpt-image-1', name: 'GPT Image 1', provider: 'OpenAI', price: 10, unit: '/M input', tier: 'Premium', badge: 'bg-amber-500/20 text-amber-400', tokenBased: true },
 ];
 
 const ASPECT_RATIOS = [
@@ -132,7 +162,8 @@ const INITIAL_PROJECTS = [
   }
 ];
 
-export default function ImageGenerator({ apiKey: providedApiKey = '', model: selectedModel, customEndpoint, providerId: layoutProvider }) {
+export default function ImageGenerator() {
+  const navigate = useNavigate();
   const [theme, setTheme] = useState('dark');
   const [activeTab, setActiveTab] = useState('workspace');
   const [projects, setProjects] = useState(INITIAL_PROJECTS);
@@ -160,17 +191,13 @@ export default function ImageGenerator({ apiKey: providedApiKey = '', model: sel
   const [stylePreset, setStylePreset] = useState(currentProject.settings.stylePreset);
   const [selectedProvider, setSelectedProvider] = useState(currentProject.settings.provider);
 
-  // مزامنة المزود الداخلي مع مزود ToolLayout
-  useEffect(() => {
-    if (layoutProvider === 'gemini' || layoutProvider === 'openrouter') {
-      setSelectedProvider(layoutProvider);
-    }
-  }, [layoutProvider]);
-
   const [referenceImages, setReferenceImages] = useState([]);
   const [isUploadingRef, setIsUploadingRef] = useState(false);
   const fileInputRef = useRef(null);
 
+  const [mode, setMode] = useState('free');
+  const [selectedORModel, setSelectedORModel] = useState(OPENROUTER_MODELS[0].id);
+  const [orApiKey, setOrApiKey] = useState(() => localStorage.getItem('imagegen_or_key') || '');
   const [pollinationsKey, setPollinationsKey] = useState('');
   const [apiErrorDetails, setApiErrorDetails] = useState(null);
 
@@ -414,28 +441,64 @@ export default function ImageGenerator({ apiKey: providedApiKey = '', model: sel
       const numOutputs = Math.max(1, Math.min(4, parseInt(outputs) || 1));
       const newGenerations = [];
 
-      for (let i = 0; i < numOutputs; i++) {
-        setGenerationProgress(40 + Math.round((i / numOutputs) * 45));
-
-        const imgSeed = Math.floor(Math.random() * 1000000);
-        const safePrompt = encodeURIComponent(enhancedPrompt).slice(0, 1800);
-        const safeNegative = negativePrompt ? `&negative=${encodeURIComponent(negativePrompt).slice(0, 400)}` : '';
-
-        let imgUrl;
-        if (pollinationsKey) {
-          imgUrl = `https://gen.pollinations.ai/image/${safePrompt}?model=flux&key=${pollinationsKey}&width=${w}&height=${h}&seed=${imgSeed}&nologo=true${safeNegative}`;
-        } else {
-          imgUrl = `https://image.pollinations.ai/prompt/${safePrompt}?width=${w}&height=${h}&seed=${imgSeed}&nologo=true&enhance=true${safeNegative}`;
-        }
-
-        newGenerations.push({
-          id: 'gen-' + Date.now() + '-' + i,
-          url: imgUrl,
-          prompt: prompt,
-          timestamp: new Date().toISOString().replace('T', ' ').substring(0, 16),
-          settings: { aspectRatio, stylePreset, quality, creativity },
-          favorite: false
+      if (mode === 'pro') {
+        setGenerationProgress(50);
+        if (!orApiKey) throw new Error('أدخل مفتاح OpenRouter API في الحقل أعلاه');
+        const orRes = await fetch('https://openrouter.ai/api/v1/images/generations', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${orApiKey}`,
+            'Content-Type': 'application/json',
+            'X-Title': 'AI Tools Hub'
+          },
+          body: JSON.stringify({
+            model: selectedORModel,
+            prompt: enhancedPrompt,
+            n: numOutputs,
+            size: `${w}x${h}`
+          })
         });
+        if (!orRes.ok) {
+          const errBody = await orRes.json().catch(() => ({}));
+          throw new Error(`OpenRouter (${orRes.status}): ${errBody?.error?.message || orRes.statusText}`);
+        }
+        const orData = await orRes.json();
+        const urls = (orData.data || []).map(d => d.url).filter(Boolean);
+        urls.forEach((url, i) => {
+          newGenerations.push({
+            id: 'gen-' + Date.now() + '-' + i,
+            url,
+            prompt,
+            timestamp: new Date().toISOString().replace('T', ' ').substring(0, 16),
+            settings: { aspectRatio, stylePreset, quality, creativity },
+            favorite: false
+          });
+        });
+        if (newGenerations.length === 0) throw new Error('OpenRouter لم يُرجع أي صور.');
+      } else {
+        for (let i = 0; i < numOutputs; i++) {
+          setGenerationProgress(40 + Math.round((i / numOutputs) * 45));
+
+          const imgSeed = Math.floor(Math.random() * 1000000);
+          const safePrompt = encodeURIComponent(enhancedPrompt).slice(0, 1800);
+          const safeNegative = negativePrompt ? `&negative=${encodeURIComponent(negativePrompt).slice(0, 400)}` : '';
+
+          let imgUrl;
+          if (pollinationsKey) {
+            imgUrl = `https://gen.pollinations.ai/image/${safePrompt}?model=flux&key=${pollinationsKey}&width=${w}&height=${h}&seed=${imgSeed}&nologo=true${safeNegative}`;
+          } else {
+            imgUrl = `https://image.pollinations.ai/prompt/${safePrompt}?width=${w}&height=${h}&seed=${imgSeed}&nologo=true&enhance=true${safeNegative}`;
+          }
+
+          newGenerations.push({
+            id: 'gen-' + Date.now() + '-' + i,
+            url: imgUrl,
+            prompt: prompt,
+            timestamp: new Date().toISOString().replace('T', ' ').substring(0, 16),
+            settings: { aspectRatio, stylePreset, quality, creativity },
+            favorite: false
+          });
+        }
       }
 
       setGenerationProgress(90);
@@ -559,6 +622,9 @@ export default function ImageGenerator({ apiKey: providedApiKey = '', model: sel
 
       <header className={`sticky top-0 z-40 px-6 py-4 border-b backdrop-blur-md flex items-center justify-between ${theme === 'dark' ? 'bg-[#0f111a]/85 border-[#1f2335]' : 'bg-white/85 border-[#e2e8f0]'}`}>
         <div className="flex items-center gap-3">
+          <button onClick={() => navigate('/')} className="text-gray-400 hover:text-white hover:bg-gray-800 p-2 rounded-lg transition-all">
+            <ArrowLeft className="w-5 h-5" />
+          </button>
           <div className="bg-gradient-to-tr from-indigo-500 via-purple-600 to-pink-500 p-2.5 rounded-xl shadow-lg">
             <Sparkles className="w-6 h-6 text-white" />
           </div>
@@ -651,6 +717,67 @@ export default function ImageGenerator({ apiKey: providedApiKey = '', model: sel
             
             <div className="lg:col-span-5 space-y-6">
               
+              <div className="bg-[#121420] border border-gray-800 p-1 rounded-2xl flex">
+                <button
+                  onClick={() => setMode('free')}
+                  className={`flex-1 py-3 rounded-xl text-sm font-semibold transition-all flex items-center justify-center gap-2 ${mode === 'free' ? 'bg-gradient-to-r from-emerald-600 to-green-600 text-white shadow' : 'text-gray-400 hover:text-white'}`}
+                >
+                  🆓 مجاني (Pollinations)
+                </button>
+                <button
+                  onClick={() => setMode('pro')}
+                  className={`flex-1 py-3 rounded-xl text-sm font-semibold transition-all flex items-center justify-center gap-2 ${mode === 'pro' ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow' : 'text-gray-400 hover:text-white'}`}
+                >
+                  💎 OpenRouter
+                </button>
+              </div>
+
+              {mode === 'pro' && (
+                <div className="bg-[#121420] border border-gray-800 p-4 rounded-2xl space-y-3">
+                  <div>
+                    <label className="text-xs font-semibold text-gray-400 block mb-1.5">🔑 مفتاح OpenRouter API</label>
+                    <input
+                      type="password"
+                      value={orApiKey}
+                      onChange={(e) => { setOrApiKey(e.target.value); localStorage.setItem('imagegen_or_key', e.target.value); }}
+                      placeholder="sk-or-v1-..."
+                      className="w-full bg-gray-950 border border-gray-800 rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border-indigo-500 font-mono"
+                    />
+                  </div>
+                  <label className="text-xs font-semibold text-gray-400 block">اختر الموديل</label>
+                  <select
+                    value={selectedORModel}
+                    onChange={(e) => setSelectedORModel(e.target.value)}
+                    className="w-full bg-gray-950 border border-gray-800 rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border-indigo-500"
+                  >
+                    {OPENROUTER_MODELS.map(m => (
+                      <option key={m.id} value={m.id} className="bg-gray-950">
+                        {m.provider} — {m.name} (${m.price}{m.unit})
+                      </option>
+                    ))}
+                  </select>
+                  {(() => {
+                    const mdl = OPENROUTER_MODELS.find(m => m.id === selectedORModel);
+                    if (!mdl) return null;
+                    const num = parseInt(outputs) || 1;
+                    const total = mdl.price * num;
+                    return (
+                      <div className="flex items-center justify-between text-xs">
+                        <span className={`px-2 py-0.5 rounded-full font-semibold ${mdl.badge}`}>{mdl.tier}</span>
+                        <span className="text-gray-400">
+                          {mdl.tokenBased
+                            ? `~$${total.toFixed(2)} (تقديري)`
+                            : `$${total.toFixed(2)} لـ ${num} صور`}
+                        </span>
+                      </div>
+                    );
+                  })()}
+                  {!orApiKey && (
+                    <p className="text-[10px] text-amber-400 mt-1">أدخل مفتاح OpenRouter API أعلاه</p>
+                  )}
+                </div>
+              )}
+
               <div className="bg-indigo-950/20 border border-indigo-900/40 p-4 rounded-2xl flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <div className="bg-indigo-500/10 p-2 rounded-lg">
@@ -856,15 +983,12 @@ export default function ImageGenerator({ apiKey: providedApiKey = '', model: sel
 
                 <div className="pt-2 border-t border-gray-800/40 space-y-3">
                   <div>
-                    <label className="text-[10px] font-bold text-gray-500 tracking-wider block mb-2 uppercase">المزوّد النشط (من شريط الأدوات)</label>
-                    <div className={`p-3 rounded-xl border ${layoutProvider === 'gemini' ? 'border-indigo-500 bg-indigo-500/10' : layoutProvider === 'openrouter' ? 'border-emerald-500 bg-emerald-500/10' : 'border-purple-500 bg-purple-500/10'} flex items-center justify-between`}>
-                      <div className="flex items-center gap-2">
-                        <div className={`w-2 h-2 rounded-full ${layoutProvider === 'gemini' ? 'bg-indigo-400' : layoutProvider === 'openrouter' ? 'bg-emerald-400' : 'bg-purple-400'}`}></div>
-                        <span className="text-sm font-semibold text-white capitalize">{layoutProvider}</span>
-                      </div>
-                      <span className="text-[10px] text-gray-400">{selectedModel}</span>
+                    <label className="text-[10px] font-bold text-gray-500 tracking-wider block mb-2 uppercase">المزوّد النشط</label>
+                    <div className="p-3 rounded-xl border border-gray-800 flex items-center gap-2">
+                      <div className={`w-2 h-2 rounded-full ${mode === 'pro' ? 'bg-purple-400' : 'bg-emerald-400'}`}></div>
+                      <span className="text-sm font-semibold text-white">{mode === 'pro' ? '💎 OpenRouter' : '🆓 Pollinations (مجاني)'}</span>
                     </div>
-                    <p className="text-[10px] text-gray-500 mt-1.5">غيّر المزوّد والموديل من شريط الأدوات العلوي</p>
+                    <p className="text-[10px] text-gray-500 mt-1.5">غيّر من الأعلى: 🆓 مجاني / 💎 OpenRouter</p>
                   </div>
                   <div>
                     <label className="text-[10px] font-bold text-gray-400 block mb-1">POLLINATIONS API KEY (للتحليل البصري)</label>
@@ -1132,28 +1256,29 @@ export default function ImageGenerator({ apiKey: providedApiKey = '', model: sel
                 <h3 className="text-sm font-semibold text-white">مفتاح API</h3>
               </div>
               <p className="text-xs text-gray-400 leading-relaxed">
-                مفتاح API يُدار من <strong className="text-indigo-400">شريط الأدوات العلوي (ToolLayout)</strong> — اختر المزوّد (Gemini, NVIDIA, OpenRouter) وأدخل مفتاحك هناك.
-                {" "}لا حاجة لإدخال المفتاح هنا.
+                <strong className="text-indigo-400">🆓 مجاني (Pollinations):</strong> ما يحتاج مفتاح — اكتب وصف وضغط Generate.
+              </p>
+              <p className="text-xs text-gray-400 leading-relaxed mt-2">
+                <strong className="text-purple-400">💎 OpenRouter:</strong> أدخل مفتاح OpenRouter API في الواجهة الرئيسية.
               </p>
               <div className="bg-indigo-950/30 border border-indigo-800/40 rounded-xl p-4 flex items-start gap-3">
                 <Key className="w-5 h-5 text-indigo-400 flex-shrink-0 mt-0.5" />
                 <div>
-                  <p className="text-xs font-semibold text-white mb-1">API Key من ToolLayout</p>
+                  <p className="text-xs font-semibold text-white mb-1">مفتاح OpenRouter</p>
                   <p className="text-[11px] text-gray-400">
-                    اختر المزوّد المناسب من القائمة المنسدلة في شريط الأدوات العلوي، ثم أدخل مفتاح API الخاص به.
-                    {" "}للتوليد عبر Gemini → اختر "Gemini". للتوليد عبر Stable Diffusion → اختر "OpenRouter".
+                    احصل على مفتاح API من <strong className="text-indigo-400">openrouter.ai/keys</strong>، اشترِ رصيدك هناك، والصق المفتاح في حقل "🔑 مفتاح OpenRouter API" في الأعلى.
                   </p>
                 </div>
               </div>
-              {providedApiKey ? (
+              {orApiKey ? (
                 <div className="bg-emerald-950/30 border border-emerald-800/40 rounded-xl p-3 flex items-center gap-2">
                   <Check className="w-4 h-4 text-emerald-400" />
-                  <span className="text-xs text-emerald-300">المفتاح موجود في ToolLayout — جاهز للتوليد.</span>
+                  <span className="text-xs text-emerald-300">مفتاح OpenRouter موجود — جاهز للتوليد.</span>
                 </div>
               ) : (
                 <div className="bg-amber-950/30 border border-amber-800/40 rounded-xl p-3 flex items-center gap-2">
                   <Key className="w-4 h-4 text-amber-400" />
-                  <span className="text-xs text-amber-300">لم يتم إدخال مفتاح بعد — اذهب إلى شريط الأدوات العلوي.</span>
+                  <span className="text-xs text-amber-300">لم يتم إدخال مفتاح OpenRouter بعد — الـ Free mode شغال بدون مفتاح.</span>
                 </div>
               )}
             </div>
@@ -1390,7 +1515,7 @@ CREATE TABLE IF NOT EXISTS generated_images (
       )}
 
       <footer className="text-center py-10 text-xs text-gray-500 space-y-1">
-        <p>© 2026 Imagine Studio. Built with React, Next.js & Google Gemini Flash Image API.</p>
+        <p>© 2026 Imagine Studio. Built with React — Pollinations (🆓) + OpenRouter (💎).</p>
         <p>Enterprise layout. Fully compliant with SOLID clean architecture guidelines.</p>
       </footer>
     </div>

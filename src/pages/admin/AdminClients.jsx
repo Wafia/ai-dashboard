@@ -58,7 +58,7 @@ export default function AdminClients() {
       setSuccess(`✅ تمت الإضافة بنجاح`);
       setModal(null);
       loadClients();
-    } catch (err) { setError(err.message); }
+    } catch (err) { setError('حدث خطأ أثناء المعالجة'); }
     finally { setSaving(false); }
   };
 
@@ -71,7 +71,7 @@ export default function AdminClients() {
       setSuccess(`✅ تم حذف ${selectedClient.email}`);
       setModal(null);
       loadClients();
-    } catch (err) { setError(err.message); }
+    } catch (err) { setError('حدث خطأ أثناء المعالجة'); }
     finally { setSaving(false); }
   };
 
@@ -84,7 +84,7 @@ export default function AdminClients() {
       await callFn('update-password', { user_id: selectedClient.auth_user_id, password: formData.password });
       setSuccess(`✅ تم تغيير كلمة المرور لـ ${selectedClient.email}`);
       setModal(null);
-    } catch (err) { setError(err.message); }
+    } catch (err) { setError('حدث خطأ أثناء المعالجة'); }
     finally { setSaving(false); }
   };
 

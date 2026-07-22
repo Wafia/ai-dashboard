@@ -149,7 +149,7 @@ Execute the 3-layer analysis and generate 6 professional prompts. Output ONLY va
       }
       setResults(parsed);
     } catch (err) {
-      setError(err.message || 'Analysis failed');
+      setError('حدث خطأ أثناء التحليل');
     } finally {
       setLoading(false);
     }

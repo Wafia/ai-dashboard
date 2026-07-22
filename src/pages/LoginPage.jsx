@@ -24,7 +24,7 @@ export default function LoginPage() {
 
       navigate(isAdmin ? '/admin/dashboard' : '/');
     } catch (err) {
-      setError(err.message === 'Invalid login credentials' ? 'الإيميل أو كلمة المرور غير صحيحة' : err.message);
+      setError(err.message === 'Invalid login credentials' ? 'الإيميل أو كلمة المرور غير صحيحة' : 'حدث خطأ في تسجيل الدخول');
     } finally {
       setLoading(false);
     }

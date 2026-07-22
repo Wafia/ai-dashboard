@@ -232,7 +232,7 @@ Analyze both images through the 3-stage engine. Generate precise adaptation inst
       if (!parsed.masterPrompt) throw new Error('Response missing masterPrompt');
       setResult(parsed);
     } catch (err) {
-      setError(err.message || 'Analysis failed');
+      setError('حدث خطأ أثناء التحليل');
     } finally {
       setLoading(false);
     }

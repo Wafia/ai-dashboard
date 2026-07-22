@@ -321,7 +321,7 @@ Output ONLY valid JSON.`;
       }
       setResult(parsed);
     } catch (err) {
-      setError(err.message || 'Analysis failed');
+      setError('حدث خطأ أثناء التحليل');
     } finally {
       setLoading(false);
     }

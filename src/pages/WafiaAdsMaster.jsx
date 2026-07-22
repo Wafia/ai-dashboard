@@ -167,7 +167,7 @@ Fais une analyse structurelle stricte en 7 points comme défini dans tes règles
       setAnalysisResult(result);
       setStep('analysis_done');
     } catch (err) {
-      setError(`❌ ${err.message || "حدث خطأ أثناء تحليل المنتج"}`);
+      setError('حدث خطأ أثناء المعالجة');
       setStep('input');
     }
   };
@@ -193,7 +193,7 @@ Fais une analyse structurelle stricte en 7 points comme défini dans tes règles
       setStep('service_done');
       setAnalysisQuestion('');
     } catch (err) {
-      setError(`❌ ${err.message || "حدث خطأ أثناء الإجابة على سؤالك"}`);
+      setError('حدث خطأ أثناء المعالجة');
       setStep('analysis_done');
     }
   };
@@ -220,7 +220,7 @@ Réponds UNIQUEMENT avec un objet JSON valide contenant une clé "avatars" qui e
       setAvatars(result);
       setStep('analysis_done');
     } catch (err) {
-      setError(`❌ ${err.message || "حدث خطأ أثناء توليد العملاء"}`);
+      setError('حدث خطأ أثناء المعالجة');
       setStep('analysis_done');
     }
   };
@@ -254,7 +254,7 @@ Réponds UNIQUEMENT avec un objet JSON valide contenant une clé "avatars" qui e
       setStep('analysis_done');
       setAvatarQuestion('');
     } catch (err) {
-      setError(`❌ ${err.message || "حدث خطأ أثناء توليد عملاء جدد"}`);
+      setError('حدث خطأ أثناء المعالجة');
       setStep('analysis_done');
     }
   };
@@ -282,7 +282,7 @@ Réponds UNIQUEMENT avec un objet JSON valide contenant une clé "angles" qui es
       setAngles(result);
       setStep('analysis_done');
     } catch (err) {
-      setError(`❌ ${err.message || "حدث خطأ أثناء توليد الزوايا التسويقية"}`);
+      setError('حدث خطأ أثناء المعالجة');
       setStep('analysis_done');
     }
   };
@@ -317,7 +317,7 @@ Réponds UNIQUEMENT avec un objet JSON valide contenant une clé "angles" qui es
       setStep('analysis_done');
       setAngleQuestion('');
     } catch (err) {
-      setError(`❌ ${err.message || "حدث خطأ أثناء ابتكار زوايا جديدة"}`);
+      setError('حدث خطأ أثناء المعالجة');
       setStep('analysis_done');
     }
   };
@@ -343,7 +343,7 @@ Réponds UNIQUEMENT avec un objet JSON valide contenant une clé "angles" qui es
       setServiceResult(result);
       setStep('service_done');
     } catch (err) {
-      setError(`❌ ${err.message || "حدث خطأ أثناء توليد الخدمة"}`);
+      setError('حدث خطأ أثناء المعالجة');
       setStep('analysis_done');
     }
   };
@@ -437,7 +437,7 @@ After presenting the copywriting, output a single, consolidated READY-TO-COPY de
       setServiceResult(result);
       setStep('service_done');
     } catch (err) {
-      setError(`❌ ${err.message || "حدث خطأ أثناء توليد الخدمة"}`);
+      setError('حدث خطأ أثناء المعالجة');
       setStep('analysis_done');
     }
   };
@@ -465,7 +465,7 @@ After presenting the copywriting, output a single, consolidated READY-TO-COPY de
       setStep('service_done');
       setCustomQuestion('');
     } catch (err) {
-      setError(`❌ ${err.message || "حدث خطأ أثناء الإجابة على سؤالك"}`);
+      setError('حدث خطأ أثناء المعالجة');
       setStep('analysis_done');
     }
   };

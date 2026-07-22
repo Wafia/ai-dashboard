@@ -49,7 +49,7 @@ Réponds UNIQUEMENT avec un objet JSON valide contenant une clé "avatars" qui e
       });
       setAvatars(result);
     } catch (err) {
-      setError(`❌ ${err.message || 'حدث خطأ'}`);
+      setError('حدث خطأ أثناء التحليل');
     } finally {
       setLoading(false);
     }
@@ -88,7 +88,7 @@ Réponds UNIQUEMENT avec un objet JSON valide contenant une clé "avatars" qui e
       setAvatars(result);
       setQuestion('');
     } catch (err) {
-      setError(`❌ ${err.message || 'حدث خطأ'}`);
+      setError('حدث خطأ أثناء التحليل');
     } finally {
       setLoading(false);
     }

@@ -157,7 +157,7 @@ export default function SawtDZ() {
         await generateBrowser();
       }
     } catch (e) {
-      setError(e.message || 'فشل التوليد');
+      setError('فشل التوليد');
     } finally {
       setBusy(false);
     }

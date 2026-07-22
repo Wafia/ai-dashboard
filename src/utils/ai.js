@@ -153,28 +153,32 @@ export async function fetchAI({
       signal: AbortSignal.timeout(300000)
     });
 
-    if (!response.ok) {
-      let errDetail = '';
-      try {
-        const errText = await response.text();
-        errDetail = errText.slice(0, 500);
-      } catch { /* ignore */ }
-      const is503 = response.status === 503;
-      if (is503) {
-        if (retries > 1) {
-          await new Promise(res => setTimeout(res, delay));
-          delay *= 2;
-          retries--;
-          continue;
+      if (!response.ok) {
+        const is503 = response.status === 503;
+        if (is503) {
+          if (retries > 1) {
+            await new Promise(res => setTimeout(res, delay));
+            delay *= 2;
+            retries--;
+            continue;
+          }
+          throw new Error('الخدمة مزدحمة حالياً. جرب بعد دقائق.');
         }
-        throw new Error('الخدمة مزدحمة حالياً. جرب بعد دقائق.');
+        const is403 = response.status === 403;
+        if (is403) {
+          throw new Error('مفتاح API أو مشروع Google غير مصرح له باستخدام Gemini API. تأكد من:\n1. تفعيل "Generative Language API" في Google Cloud Console\n2. أو استخدم مفتاح من aistudio.google.com\n3. أو المشروع قد يكون محظوراً — راسل الدعم.');
+        }
+        if (response.status === 401) {
+          throw new Error('مفتاح API غير صالح. تأكد من المفتاح وحاول مرة أخرى.');
+        }
+        if (response.status === 429) {
+          throw new Error('تجاوزت حد الطلبات المسموح. انتظر قليلاً وحاول مرة أخرى.');
+        }
+        if (response.status === 400) {
+          throw new Error('الطلب غير صحيح. تأكد من البيانات المدخلة وحاول مرة أخرى.');
+        }
+        throw new Error('فشل الاتصال بالخدمة. تحقق من اتصالك بالإنترنت وحاول مرة أخرى.');
       }
-      const is403 = response.status === 403;
-      if (is403) {
-        throw new Error('مفتاح API أو مشروع Google غير مصرح له باستخدام Gemini API. تأكد من:\n1. تفعيل "Generative Language API" في Google Cloud Console\n2. أو استخدم مفتاح من aistudio.google.com\n3. أو المشروع قد يكون محظوراً — راسل الدعم.');
-      }
-      throw new Error(`[${response.status}] ${response.statusText}${errDetail ? ` - ${errDetail}` : ''}`);
-    }
 
     const data = await response.json();
     const result = expectJsonArray ? provider.parseJson(data) : provider.parseChat(data);

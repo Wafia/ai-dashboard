@@ -232,7 +232,7 @@ Analyze the reference image deeply. Generate professional prompts that place my 
       setResult(parsed);
       setStep(2);
     } catch (err) {
-      setError(err.message || 'Analysis failed');
+      setError('حدث خطأ أثناء التحليل');
     } finally {
       setLoading(false);
     }

@@ -1,10 +1,7 @@
 import {
   Megaphone,
   PenTool,
-  MessageCircle,
   Image as ImageIcon,
-  Code,
-  Sparkles,
   Users,
   Camera,
   Palette,
@@ -12,7 +9,8 @@ import {
   LayoutGrid,
   User,
   Mic,
-  Volume2
+  Volume2,
+  Video
 } from 'lucide-react';
 
 export const tools = [
@@ -127,49 +125,27 @@ export const tools = [
     apiKeyPlaceholder: 'أدخل مفتاح Gemini API (اختياري)'
   },
   {
-    id: 'chatbot',
-    title: 'Chatbot Builder',
-    description: 'بناء محادثات وروبوتات دردشة تفاعلية لخدمة العملاء والمبيعات',
-    icon: MessageCircle,
-    color: 'pink',
-    gradient: 'from-pink-500 to-rose-600',
-    component: 'ToolComingSoon',
-    apiKeyLabel: 'مفتاح AI API',
-    apiKeyPlaceholder: 'أدخل مفتاح API...'
-  },
-  {
     id: 'image-gen',
     title: 'Image Generator',
     description: 'توليد صور إعلانية ومنتجات احترافية باستخدام الذكاء الاصطناعي — Imagine Studio Pro',
     icon: ImageIcon,
-    color: 'amber',
-    gradient: 'from-amber-500 to-orange-600',
+    color: 'emerald',
+    gradient: 'from-emerald-500 to-green-600',
     component: 'ImageGenerator',
     apiKeyLabel: 'مفتاح Image API',
     apiKeyPlaceholder: 'أدخل مفتاح API...',
     noKeyRequired: true
   },
   {
-    id: 'code-helper',
-    title: 'Code Assistant',
-    description: 'مساعد برمجي ذكي لكتابة وتصحيح وتحسين الأكواد البرمجية',
-    icon: Code,
-    color: 'blue',
-    gradient: 'from-blue-500 to-indigo-600',
+    id: 'video-generator',
+    title: 'Video Generator',
+    description: 'توليد فيديوهات إعلانية احترافية باستخدام الذكاء الاصطناعي',
+    icon: Video,
+    color: 'purple',
+    gradient: 'from-purple-500 to-pink-600',
     component: 'ToolComingSoon',
-    apiKeyLabel: 'مفتاح AI API',
-    apiKeyPlaceholder: 'أدخل مفتاح API...'
-  },
-  {
-    id: 'seo-tools',
-    title: 'SEO Optimizer',
-    description: 'تحسين محركات البحث وتحليل الكلمات المفتاحية لمحتواك',
-    icon: Sparkles,
-    color: 'cyan',
-    gradient: 'from-cyan-500 to-sky-600',
-    component: 'ToolComingSoon',
-    apiKeyLabel: 'مفتاح AI API',
-    apiKeyPlaceholder: 'أدخل مفتاح API...'
+    apiKeyLabel: '',
+    apiKeyPlaceholder: ''
   }
 ];
 

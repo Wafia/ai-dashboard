@@ -197,7 +197,7 @@ Analyze the product image. Identify its top 3 features. Generate 6 diverse photo
       if (!parsed.angles || !parsed.angles.length) throw new Error('Response missing angles array');
       setResult(parsed);
     } catch (err) {
-      setError(err.message || 'Analysis failed');
+      setError('حدث خطأ أثناء التحليل');
     } finally {
       setLoading(false);
     }

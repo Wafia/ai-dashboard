@@ -69,6 +69,10 @@ export default function ToolPage() {
     return <SawtDZ />;
   }
 
+  if (tool.component === 'ImageGenerator') {
+    return <ImageGenerator />;
+  }
+
   const renderTool = () => {
     const toolProps = { apiKey, model, customEndpoint, providerId };
     switch (tool.component) {
@@ -90,8 +94,6 @@ export default function ToolPage() {
         return <WearCraft {...toolProps} />;
       case 'AdScriptStudio':
         return <AdScriptStudio {...toolProps} />;
-      case 'ImageGenerator':
-        return <ImageGenerator {...toolProps} />;
       default:
         return <ToolComingSoon toolId={toolId} />;
     }
